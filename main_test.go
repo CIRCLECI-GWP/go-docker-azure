@@ -68,3 +68,5 @@ func TestGetCompaniesHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 	assert.NotEmpty(t, companies)
 }
+
+
