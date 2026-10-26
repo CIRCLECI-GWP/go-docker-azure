@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,7 +30,7 @@ func TestHomepageHandler(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 
-	responseData, _ := ioutil.ReadAll(w.Body)
+	responseData, _ := io.ReadAll(w.Body)
 	assert.Equal(t, mockResponse, string(responseData))
 	assert.Equal(t, http.StatusOK, w.Code)
 }
@@ -70,3 +70,43 @@ func TestGetCompaniesHandler(t *testing.T) {
 }
 
 
+
+func TestUpdateCompanyHandler(t *testing.T) {
+	r := SetUpRouter()
+	r.PUT("/company/:id", UpdateCompanyHandler)
+
+	company := Company{
+		ID: "3",
+		Name: "Microsoft",
+		CEO: "Satya Nadella",
+		Revenue: "245 billion",
+	}
+
+	jsonValue, _ := json.Marshal(company)
+	req, _ := http.NewRequest("PUT", "/company/3", bytes.NewBuffer(jsonValue))
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	for _, c := range companies {
+		if c.ID == "3" {
+			assert.Equal(t, "245 billion", c.Revenue)
+		}
+		if c.ID == "2" {
+			assert.Equal(t, "Netflix", c.Name)
+		}
+	}
+}
+
+func TestDeleteCompanyHandler(t *testing.T) {
+	r := SetUpRouter()
+	r.DELETE("/company/:id", DeleteCompanyHandler)
+	req, _ := http.NewRequest("DELETE", "/company/1", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+	for _, c := range companies {
+		assert.NotEqual(t, "1", c.ID)
+	}
+}
