@@ -61,7 +61,7 @@ func UpdateCompanyHandler(c *gin.Context) {
 
 	for i := 0; i < len(companies); i++ {
 		if companies[i].ID == id {
-			index = 1
+			index = i
 		}
 	}
 
@@ -83,7 +83,7 @@ func DeleteCompanyHandler(c *gin.Context) {
 
 	for i := 0; i < len(companies); i++ {
 		if companies[i].ID == id {
-			index = 1
+			index = i
 		}
 	}
 
